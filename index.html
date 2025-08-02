@@ -202,6 +202,11 @@
                 </div>
             </fieldset>
             <button type="submit">Lanjutkan ke Set Up STA</button>
+            <hr>
+            <div class="form-group">
+                <label for="load-data-file">Atau muat data yang sudah ada:</label>
+                <input type="file" id="load-data-file" accept=".json">
+            </div>
         </form>
     </div>
 
@@ -283,7 +288,6 @@
             <button type="button" id="export-csv-btn" class="btn-secondary">Unduh CSV</button>
             <button type="button" id="submit-data-btn" class="add-point-btn">Unduh JSON</button>
             <button type="button" id="start-new-btn" class="add-point-btn">Mulai Pengukuran Baru</button>
-            <button type="button" id="share-btn" class="btn-secondary">Share Data</button>
             <button type="button" id="exit-btn" class="btn-secondary">Keluar Aplikasi</button>
         </div>
     </div>
@@ -360,8 +364,9 @@
         const submitDataBtn = document.getElementById('submit-data-btn');
         const exportCsvBtn = document.getElementById('export-csv-btn');
         const startNewBtn = document.getElementById('start-new-btn');
-        const shareBtn = document.getElementById('share-btn');
         const exitBtn = document.getElementById('exit-btn');
+        
+        const loadDataFile = document.getElementById('load-data-file');
         
         const pointTemplate = document.getElementById('point-template');
 
@@ -391,7 +396,7 @@
             elevasiAktualInput.value = elevasiAktual.toFixed(3);
         }
 
-        function addPointEntry() {
+        function addPointEntry(pointData = null) {
             const newPoint = pointTemplate.content.cloneNode(true);
             const pointNumber = pointsContainer.children.length + 1;
             newPoint.querySelector('.point-number').textContent = pointNumber;
@@ -403,7 +408,28 @@
                 calculateElevasiAktual(bacaanRambuInput, elevasiAktualInput);
             });
             
+            if (pointData) {
+                newPoint.querySelector('input[name="nama_titik"]').value = pointData.nama_titik;
+                newPoint.querySelector('select[name="jenis_observasi"]').value = pointData.jenis_observasi;
+                newPoint.querySelector('input[name="bacaan_rambu"]').value = pointData.bacaan_rambu;
+                newPoint.querySelector('input[name="offset"]').value = pointData.offset;
+                newPoint.querySelector('select[name="arah_offset"]').value = pointData.arah_offset;
+                newPoint.querySelector('input[name="keterangan"]').value = pointData.keterangan;
+                // Calculate elevasi aktual for loaded data
+                const elevasiAktual = calculatedHI - parseFloat(pointData.bacaan_rambu);
+                elevasiAktualInput.value = elevasiAktual.toFixed(3);
+            }
+
             pointsContainer.appendChild(newPoint);
+        }
+
+        function fillForm(form, data) {
+            for (const key in data) {
+                const input = form.querySelector(`[name="${key}"]`);
+                if (input) {
+                    input.value = data[key];
+                }
+            }
         }
         
         function serializeFormData(form) {
@@ -511,6 +537,15 @@
             ctx.fillText('Elevasi', 10, 20);
         }
         
+        function generateFilename(extension) {
+            const date = allData.project.tanggal_pengukuran;
+            const location = allData.project.lokasi_proyek;
+            const sta = allData.sta.titik_berdiri_alat_sta;
+            // Ganti spasi dengan underscore untuk nama file
+            const filename = `${date}_${location.replace(/\s/g, '_')}_${sta.replace(/\s/g, '_')}.${extension}`;
+            return filename;
+        }
+
         function exportToCSV() {
             if (!allData || !allData.points || allData.points.length === 0) {
                 alert('Tidak ada data poin untuk diekspor!');
@@ -546,7 +581,7 @@
                 csvContent += row;
             });
 
-            const filename = `data_ukur_${allData.sta.titik_berdiri_alat_sta}.csv`;
+            const filename = generateFilename('csv');
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement('a');
             link.setAttribute('href', encodedUri);
@@ -556,38 +591,6 @@
             document.body.removeChild(link);
             
             alert('Data berhasil diunduh dalam format CSV!');
-        }
-
-        function shareData() {
-            if (!allData || !allData.points || allData.points.length === 0) {
-                alert('Tidak ada data yang bisa di-share.');
-                return;
-            }
-            
-            let shareText = `Laporan Pengukuran Beda Tinggi\n\n`;
-            shareText += `Surveyor: ${allData.project.surveyor}\n`;
-            shareText += `Lokasi: ${allData.project.lokasi_proyek}\n`;
-            shareText += `Tanggal: ${allData.project.tanggal_pengukuran}\n`;
-            shareText += `STA: ${allData.sta.titik_berdiri_alat_sta}\n`;
-            shareText += `HI: ${allData.sta.calculated_hi}\n\n`;
-            shareText += `Ringkasan Titik Target:\n`;
-            allData.points.forEach(point => {
-                shareText += `- ${point.nama_titik}: Elevasi ${point.elevasi_aktual}, Offset ${point.offset} (${point.arah_offset})\n`;
-            });
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Laporan Pengukuran Beda Tinggi',
-                    text: shareText,
-                }).then(() => {
-                    console.log('Berhasil membagikan data.');
-                }).catch((error) => {
-                    console.error('Gagal membagikan data:', error);
-                    alert('Gagal membagikan data. Pastikan Anda menggunakan browser yang mendukung fitur ini.');
-                });
-            } else {
-                alert('Fitur share tidak didukung di browser ini. Data berikut dapat Anda salin dan bagikan:\n\n' + shareText);
-            }
         }
 
         function resetForms() {
@@ -608,6 +611,41 @@
 
         function exitApplication() {
             alert('Untuk keluar dari aplikasi, silakan tutup jendela ini secara manual.');
+        }
+
+        function loadDataFromFile() {
+            const file = loadDataFile.files[0];
+            if (!file) {
+                alert('Pilih file JSON terlebih dahulu.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    allData = JSON.parse(event.target.result);
+                    
+                    // Isi formulir proyek
+                    fillForm(projectForm, allData.project);
+                    
+                    // Isi formulir STA
+                    fillForm(staForm, allData.sta);
+                    calculateHI(); // Hitung ulang HI setelah data terisi
+
+                    // Hapus titik lama dan isi titik baru
+                    pointsContainer.innerHTML = '';
+                    allData.points.forEach(point => addPointEntry(point));
+                    
+                    // Pindah ke halaman input titik untuk diedit
+                    page1.classList.add('hidden');
+                    page3.classList.remove('hidden');
+                    alert('Data berhasil dimuat. Anda sekarang dapat mengedit data titik.');
+                    
+                } catch (e) {
+                    alert('Gagal memuat file. Pastikan file yang Anda pilih adalah file JSON yang valid.');
+                }
+            };
+            reader.readAsText(file);
         }
 
         // --- LOGIKA NAVIGASI & PENYIMPANAN DATA ---
@@ -652,6 +690,9 @@
         // Tambahkan event listener untuk tombol "Tambah Titik"
         addPointBtn.addEventListener('click', addPointEntry);
         
+        // Event listener untuk tombol "Muat Data"
+        loadDataFile.addEventListener('change', loadDataFromFile);
+
         // Perhitungan HI
         elevasiBmTtpInput.addEventListener('input', calculateHI);
         bsInput.addEventListener('input', calculateHI);
@@ -685,7 +726,7 @@
             const dataToSave = JSON.stringify(allData, null, 2);
             localStorage.setItem('pengukuran_' + allData.sta.titik_berdiri_alat_sta, dataToSave);
             
-            const filename = `data_ukur_${allData.sta.titik_berdiri_alat_sta}.json`;
+            const filename = generateFilename('json');
             const blob = new Blob([dataToSave], {type: 'application/json'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
@@ -700,9 +741,6 @@
 
         // Logika untuk tombol "Mulai Pengukuran Baru"
         startNewBtn.addEventListener('click', startNewMeasurement);
-
-        // Logika untuk tombol "Share"
-        shareBtn.addEventListener('click', shareData);
 
         // Logika untuk tombol "Keluar Aplikasi"
         exitBtn.addEventListener('click', exitApplication);
