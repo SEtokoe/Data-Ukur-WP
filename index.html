@@ -151,8 +151,8 @@
                 <div class="form-group">
                     <label for="lokasi_proyek">Lokasi Proyek:</label>
                     <select id="lokasi_proyek" name="lokasi_proyek" required>
-                        <option value="">-- Pilih Proyek --</option>
-                        <option value="">-- Pilih Proyek --</option>
+                        <option value="">-- Pilih Lokasi Proyek --</option>
+<option value="">-- Pilih Lokasi Proyek --</option>
                         <option value="D.I.R. Sukaraja">D.I.R. Sukaraja</option>
                         <option value="D.I.R. Doros">D.I.R. Doros</option>
                         <option value="D.I.R. Mulyaguna">D.I.R. Mulyaguna</option>
@@ -284,6 +284,7 @@
             <button type="button" id="export-csv-btn" class="btn-secondary">Unduh CSV</button>
             <button type="button" id="submit-data-btn" class="add-point-btn">Unduh JSON</button>
             <button type="button" id="start-new-btn" class="add-point-btn">Mulai Pengukuran Baru</button>
+            <button type="button" id="share-btn" class="btn-secondary">Share Data</button>
             <button type="button" id="exit-btn" class="btn-secondary">Keluar Aplikasi</button>
         </div>
     </div>
@@ -360,6 +361,7 @@
         const submitDataBtn = document.getElementById('submit-data-btn');
         const exportCsvBtn = document.getElementById('export-csv-btn');
         const startNewBtn = document.getElementById('start-new-btn');
+        const shareBtn = document.getElementById('share-btn');
         const exitBtn = document.getElementById('exit-btn');
         
         const pointTemplate = document.getElementById('point-template');
@@ -515,23 +517,78 @@
                 alert('Tidak ada data poin untuk diekspor!');
                 return;
             }
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Tambahkan header informasi proyek & STA
+            csvContent += "Informasi Proyek,,\n";
+            csvContent += `Surveyor,${allData.project.surveyor},\n`;
+            csvContent += `Tanggal Pengukuran,${allData.project.tanggal_pengukuran},\n`;
+            csvContent += `Lokasi Proyek,${allData.project.lokasi_proyek},\n`;
+            csvContent += `Item Pekerjaan,${allData.project.item_pekerjaan},\n`;
+            csvContent += `Kondisi Cuaca,${allData.project.kondisi_cuaca},\n\n`;
 
+            csvContent += "Informasi STA,,\n";
+            csvContent += `Alat Waterpass,${allData.sta.alat_waterpass},\n`;
+            csvContent += `Nomor Seri Alat,${allData.sta.nomor_seri_alat},\n`;
+            csvContent += `Titik Berdiri Alat (STA),${allData.sta.titik_berdiri_alat_sta},\n`;
+            csvContent += `BM/TTP,${allData.sta.bm_ttp},\n`;
+            csvContent += `Bacaan Rambu BS,${allData.sta.bs},\n`;
+            csvContent += `Elevasi BM/TTP,${allData.sta.elevasi_bm_ttp},\n`;
+            csvContent += `Calculated HI,${allData.sta.calculated_hi},\n\n`;
+
+            // Tambahkan header tabel titik
             const header = 'No,Nama Titik,Jenis Observasi,Bacaan Rambu,Elevasi Aktual,Offset,Arah Offset,Keterangan\n';
-            let csvContent = header;
+            csvContent += header;
 
+            // Tambahkan data titik
             allData.points.forEach((point, index) => {
                 const row = `${index + 1},${point.nama_titik},${point.jenis_observasi},${point.bacaan_rambu},${point.elevasi_aktual},${point.offset},${point.arah_offset},${point.keterangan}\n`;
                 csvContent += row;
             });
 
             const filename = `data_ukur_${allData.sta.titik_berdiri_alat_sta}.csv`;
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = filename;
-            a.click();
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             
             alert('Data berhasil diunduh dalam format CSV!');
+        }
+
+        function shareData() {
+            if (!allData || !allData.points || allData.points.length === 0) {
+                alert('Tidak ada data yang bisa di-share.');
+                return;
+            }
+            
+            let shareText = `Laporan Pengukuran Beda Tinggi\n\n`;
+            shareText += `Surveyor: ${allData.project.surveyor}\n`;
+            shareText += `Lokasi: ${allData.project.lokasi_proyek}\n`;
+            shareText += `Tanggal: ${allData.project.tanggal_pengukuran}\n`;
+            shareText += `STA: ${allData.sta.titik_berdiri_alat_sta}\n`;
+            shareText += `HI: ${allData.sta.calculated_hi}\n\n`;
+            shareText += `Ringkasan Titik Target:\n`;
+            allData.points.forEach(point => {
+                shareText += `- ${point.nama_titik}: Elevasi ${point.elevasi_aktual}, Offset ${point.offset} (${point.arah_offset})\n`;
+            });
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Laporan Pengukuran Beda Tinggi',
+                    text: shareText,
+                }).then(() => {
+                    console.log('Berhasil membagikan data.');
+                }).catch((error) => {
+                    console.error('Gagal membagikan data:', error);
+                    alert('Gagal membagikan data. Pastikan Anda menggunakan browser yang mendukung fitur ini.');
+                });
+            } else {
+                alert('Fitur share tidak didukung di browser ini. Data berikut dapat Anda salin dan bagikan:\n\n' + shareText);
+            }
         }
 
         function resetForms() {
@@ -644,6 +701,9 @@
 
         // Logika untuk tombol "Mulai Pengukuran Baru"
         startNewBtn.addEventListener('click', startNewMeasurement);
+
+        // Logika untuk tombol "Share"
+        shareBtn.addEventListener('click', shareData);
 
         // Logika untuk tombol "Keluar Aplikasi"
         exitBtn.addEventListener('click', exitApplication);
