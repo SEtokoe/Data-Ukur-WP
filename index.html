@@ -192,6 +192,7 @@
                 <div class="form-group">
                     <label for="kondisi_cuaca">Kondisi Cuaca:</label>
                     <select id="kondisi_cuaca" name="kondisi_cuaca">
+                        <option value="">-- Pilih Cuaca --</option>
                         <option value="Cerah">Cerah</option>
                         <option value="Mendung">Mendung</option>
                         <option value="Gerimis">Gerimis</option>
@@ -280,7 +281,8 @@
         <div class="btn-group">
             <button type="button" id="back-to-page3">Kembali untuk Edit</button>
             <button type="button" id="export-csv-btn" class="btn-secondary">Unduh CSV</button>
-            <button type="button" id="submit-data-btn">Unduh JSON</button>
+            <button type="button" id="start-new-btn" class="add-point-btn">Mulai Pengukuran Baru</button>
+            <button type="button" id="exit-btn" class="btn-secondary">Keluar Aplikasi</button>
         </div>
     </div>
 
@@ -355,6 +357,8 @@
         const addPointBtn = document.getElementById('add-point-btn');
         const submitDataBtn = document.getElementById('submit-data-btn');
         const exportCsvBtn = document.getElementById('export-csv-btn');
+        const startNewBtn = document.getElementById('start-new-btn');
+        const exitBtn = document.getElementById('exit-btn');
         
         const pointTemplate = document.getElementById('point-template');
 
@@ -528,6 +532,26 @@
             alert('Data berhasil diunduh dalam format CSV!');
         }
 
+        function resetForms() {
+            projectForm.reset();
+            staForm.reset();
+            pointsContainer.innerHTML = '';
+            addPointEntry(); // Tambahkan satu titik kosong
+            allData = {};
+        }
+
+        function startNewMeasurement() {
+            resetForms();
+            page4.classList.add('hidden');
+            page1.classList.remove('hidden');
+            calculatedHI = 0;
+            calculatedHiInput.value = '';
+        }
+
+        function exitApplication() {
+            alert('Untuk keluar dari aplikasi, silakan tutup jendela ini secara manual.');
+        }
+
         // --- LOGIKA NAVIGASI & PENYIMPANAN DATA ---
         
         // Halaman 1 -> Halaman 2
@@ -615,6 +639,12 @@
         
         // Logika untuk tombol "Unduh CSV"
         exportCsvBtn.addEventListener('click', exportToCSV);
+
+        // Logika untuk tombol "Mulai Pengukuran Baru"
+        startNewBtn.addEventListener('click', startNewMeasurement);
+
+        // Logika untuk tombol "Keluar Aplikasi"
+        exitBtn.addEventListener('click', exitApplication);
     </script>
 </body>
 </html>
