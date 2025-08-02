@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Pengukuran Beda Tinggi</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        p {
+            text-align: center;
+            color: #666;
+        }
+        fieldset {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+        legend {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #555;
+            padding: 0 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444;
+        }
+        input[type="text"], input[type="date"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-group button {
+            flex: 1;
+            margin: 0;
+        }
+        .hidden {
+            display: none;
+        }
+        .point-entry {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .add-point-btn {
+            background-color: #28a745;
+        }
+        .add-point-btn:hover {
+            background-color: #218838;
+        }
+        /* Style untuk halaman review */
+        .review-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .review-section h2 {
+            margin-top: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #cross-section-plot {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="page1" class="container">
+        <h1>Aplikasi Pengukuran Beda Tinggi</h1>
+        <p>Isi informasi proyek dan surveyor untuk memulai.</p>
+        <form id="project-form">
+            <fieldset>
+                <legend>Informasi Proyek & Surveyor</legend>
+                <div class="form-group">
+                    <label for="surveyor">Surveyor:</label>
+                    <input type="text" id="surveyor" name="surveyor" required>
+                </div>
+                <div class="form-group">
+                    <label for="tanggal_pengukuran">Tanggal Pengukuran:</label>
+                    <input type="date" id="tanggal_pengukuran" name="tanggal_pengukuran" required>
+                </div>
+                <div class="form-group">
+                    <label for="lokasi_proyek">Lokasi Proyek:</label>
+                    <select id="lokasi_proyek" name="lokasi_proyek" required>
+                        <option value="">-- Pilih Proyek --</option>
+                        <option value="D.I.R. Sukaraja">D.I.R. Sukaraja</option>
+                        <option value="D.I.R. Doros">D.I.R. Doros</option>
+                        <option value="D.I.R. Mulyaguna">D.I.R. Mulyaguna</option>
+                        <option value="D.I.R. Sukapulih">D.I.R. Sukapulih</option>
+                        <option value="D.I.R. Pulau Gemantung">D.I.R. Pulau Gemantung</option>
+                        <option value="D.I.R. Tanjung Beringin Trans">D.I.R. Tanjung Beringin Trans</option>
+                        <option value="D.I.R. Talang Cempedak">D.I.R. Talang Cempedak</option>
+                        <option value="D.I.R. Tanjung Serang">D.I.R. Tanjung Serang</option>
+                        <option value="D.I.R. Ulak Jermun">D.I.R. Ulak Jermun</option>
+                        <option value="D.I.R. Sidomulyo">D.I.R. Sidomulyo</option>
+                        <option value="D.I.R. Kayu Labu">D.I.R. Kayu Labu</option>
+                        <option value="D.I.R. Sungai Jeruju">D.I.R. Sungai Jeruju</option>
+                        <option value="D.I.R. Balam Jeruju">D.I.R. Balam Jeruju</option>
+                        <option value="D.I.R. Adil Makmur">D.I.R. Adil Makmur</option>
+                        <option value="D.I.R. Sungai Ketupak">D.I.R. Sungai Ketupak</option>
+                        <option value="D.I.R. Gajah Mukti">D.I.R. Gajah Mukti</option>
+                        <option value="D.I.R. Dewa Sibur">D.I.R. Dewa Sibur</option>
+                        <option value="D.I.R. Nata Sibur">D.I.R. Nata Sibur</option>
+                        <option value="D.I.R. Lebak Semendawai">D.I.R. Lebak Semendawai</option>
+                        <option value="D.I.R. Adumanis">D.I.R. Adumanis</option>
+                        <option value="D.I.R. Lebak Tobong">D.I.R. Lebak Tobong</option>
+                        <option value="D.I.R. Lebak Datuk">D.I.R. Lebak Datuk</option>
+                        <option value="D.I.R. Serudung">D.I.R. Serudung</option>
+                        <option value="D.I.R. Sungai Ulak Baru">D.I.R. Sungai Ulak Baru</option>
+                        <option value="D.I.R. Arisan Musi Timur">D.I.R. Arisan Musi Timur</option>
+                        <option value="D.I.R. Arisan Musi">D.I.R. Arisan Musi</option>
+                        <option value="D.I. Sungai Jerami">D.I. Sungai Jerami</option>
+                        <option value="D.I.R. Lingkis">D.I.R. Lingkis</option>
+                        <option value="D.I.R. Gedung Buruk">D.I.R. Gedung Buruk</option>
+                        <option value="D.I.R. Tanjung Sejaro">D.I.R. Tanjung Sejaro</option>
+                        <option value="D.I.R. Siring Alam">D.I.R. Siring Alam</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="item_pekerjaan">Item Pekerjaan/Area:</label>
+                    <input type="text" id="item_pekerjaan" name="item_pekerjaan" required>
+                </div>
+                <div class="form-group">
+                    <label for="kondisi_cuaca">Kondisi Cuaca:</label>
+                    <select id="kondisi_cuaca" name="kondisi_cuaca">
+                        <option value="Cerah">Cerah</option>
+                        <option value="Mendung">Mendung</option>
+                        <option value="Gerimis">Gerimis</option>
+                        <option value="Hujan Sedang">Hujan Sedang</option>
+                        <option value="Hujan Lebat">Hujan Lebat</option>
+                    </select>
+                </div>
+            </fieldset>
+            <button type="submit">Lanjutkan ke Set Up STA</button>
+        </form>
+    </div>
+
+    <div id="page2" class="container hidden">
+        <h1>Aplikasi Pengukuran Beda Tinggi</h1>
+        <p>Isi detail Set Up Alat (STA) untuk memulai pengukuran.</p>
+        <form id="sta-form">
+            <fieldset>
+                <legend>Set Up Alat & STA</legend>
+                <div class="form-group">
+                    <label for="alat_waterpass">Alat Waterpass:</label>
+                    <input type="text" id="alat_waterpass" name="alat_waterpass">
+                </div>
+                <div class="form-group">
+                    <label for="nomor_seri_alat">Nomor Seri Alat:</label>
+                    <input type="text" id="nomor_seri_alat" name="nomor_seri_alat">
+                </div>
+                <div class="form-group">
+                    <label for="titik_berdiri_alat_sta">Titik Berdiri Alat (STA):</label>
+                    <input type="text" id="titik_berdiri_alat_sta" name="titik_berdiri_alat_sta" required>
+                </div>
+                <div class="form-group">
+                    <label for="bm_ttp">BM/TTP:</label>
+                    <input type="text" id="bm_ttp" name="bm_ttp" required>
+                </div>
+                <div class="form-group">
+                    <label for="bs">Bacaan Rambu Backsight (BS):</label>
+                    <input type="number" id="bs" name="bs" step="0.001" required>
+                </div>
+                <div class="form-group">
+                    <label for="elevasi_bm_ttp">Elevasi BM/TTP:</label>
+                    <input type="number" id="elevasi_bm_ttp" name="elevasi_bm_ttp" step="0.001" required>
+                </div>
+                <div class="form-group">
+                    <label>Calculated HI:</label>
+                    <input type="text" id="calculated_hi" readonly>
+                </div>
+            </fieldset>
+            <button type="submit" id="start-points-btn">Mulai Input Titik Target</button>
+            <button type="button" id="back-to-page1" class="btn-secondary">Kembali</button>
+        </form>
+    </div>
+
+    <div id="page3" class="container hidden">
+        <h1>Input Titik Target</h1>
+        <p>Tambahkan titik target untuk STA ini.</p>
+        <form id="points-form">
+            <div id="points-container">
+            </div>
+            <button type="button" id="add-point-btn" class="add-point-btn">+ Tambah Titik</button>
+            <button type="submit" id="review-btn">Selesai STA Ini & Lanjutkan ke Cek & Ricek</button>
+            <button type="button" id="back-to-page2" class="btn-secondary">Kembali</button>
+        </form>
+    </div>
+
+    <div id="page4" class="container hidden">
+        <h1>Cek & Ricek Data Ukur</h1>
+        <p>Review ringkasan data dan sketsa sebelum mengirim.</p>
+
+        <div class="review-section">
+            <h2>Ringkasan STA</h2>
+            <div id="review-sta-summary">
+            </div>
+        </div>
+
+        <div class="review-section">
+            <h2>Sketsa Profil Cross-Section</h2>
+            <canvas id="cross-section-plot"></canvas>
+        </div>
+
+        <div class="review-section">
+            <h2>Ringkasan Titik Target</h2>
+            <div id="review-points-table">
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="button" id="back-to-page3">Kembali untuk Edit</button>
+            <button type="button" id="export-csv-btn" class="btn-secondary">Unduh CSV</button>
+            <button type="button" id="submit-data-btn">Unduh JSON</button>
+        </div>
+    </div>
+
+    <template id="point-template">
+        <div class="point-entry">
+            <legend>Titik Target <span class="point-number">1</span></legend>
+            <div class="form-group">
+                <label>Nama Titik Target:</label>
+                <input type="text" name="nama_titik" required>
+            </div>
+            <div class="form-group">
+                <label>Jenis Observasi:</label>
+                <select name="jenis_observasi">
+                    <option value="BS">Backsight</option>
+                    <option value="FS">Foresight</option>
+                    <option value="IS">Intermediate Sight</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Bacaan Rambu:</label>
+                <input type="number" name="bacaan_rambu" step="0.001" required>
+            </div>
+            <div class="form-group">
+                <label>Elevasi Aktual:</label>
+                <input type="text" name="elevasi_aktual" readonly>
+            </div>
+            <div class="form-group">
+                <label>Offset:</label>
+                <input type="number" name="offset" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Arah Offset:</label>
+                <select name="arah_offset">
+                    <option value="Kiri">Kiri</option>
+                    <option value="Centerline (CL)">Centerline (CL)</option>
+                    <option value="Kanan">Kanan</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Keterangan:</label>
+                <input type="text" name="keterangan">
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // PWA: Daftarkan Service Worker
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function() {
+            navigator.serviceWorker.register('service-worker.js').then(function(registration) {
+              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, function(err) {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+          });
+        }
+
+        // Ambil elemen-elemen halaman dan form
+        const page1 = document.getElementById('page1');
+        const page2 = document.getElementById('page2');
+        const page3 = document.getElementById('page3');
+        const page4 = document.getElementById('page4');
+        
+        const projectForm = document.getElementById('project-form');
+        const staForm = document.getElementById('sta-form');
+        const pointsForm = document.getElementById('points-form');
+        const pointsContainer = document.getElementById('points-container');
+        
+        const backToPage1Btn = document.getElementById('back-to-page1');
+        const backToPage2Btn = document.getElementById('back-to-page2');
+        const backToPage3Btn = document.getElementById('back-to-page3');
+        const addPointBtn = document.getElementById('add-point-btn');
+        const submitDataBtn = document.getElementById('submit-data-btn');
+        const exportCsvBtn = document.getElementById('export-csv-btn');
+        
+        const pointTemplate = document.getElementById('point-template');
+
+        const elevasiBmTtpInput = document.getElementById('elevasi_bm_ttp');
+        const bsInput = document.getElementById('bs');
+        const calculatedHiInput = document.getElementById('calculated_hi');
+
+        const reviewStaSummary = document.getElementById('review-sta-summary');
+        const reviewPointsTable = document.getElementById('review-points-table');
+        const plotCanvas = document.getElementById('cross-section-plot');
+
+        // --- FUNGSI PERHITUNGAN & LOGIKA UTAMA ---
+        let calculatedHI = 0;
+        let allData = {};
+
+        function calculateHI() {
+            const elevasiBmTtp = parseFloat(elevasiBmTtpInput.value) || 0;
+            const bs = parseFloat(bsInput.value) || 0;
+            
+            calculatedHI = elevasiBmTtp + bs;
+            calculatedHiInput.value = calculatedHI.toFixed(3);
+        }
+
+        function calculateElevasiAktual(bacaanRambuInput, elevasiAktualInput) {
+            const bacaanRambu = parseFloat(bacaanRambuInput.value) || 0;
+            const elevasiAktual = calculatedHI - bacaanRambu;
+            elevasiAktualInput.value = elevasiAktual.toFixed(3);
+        }
+
+        function addPointEntry() {
+            const newPoint = pointTemplate.content.cloneNode(true);
+            const pointNumber = pointsContainer.children.length + 1;
+            newPoint.querySelector('.point-number').textContent = pointNumber;
+            
+            const bacaanRambuInput = newPoint.querySelector('input[name="bacaan_rambu"]');
+            const elevasiAktualInput = newPoint.querySelector('input[name="elevasi_aktual"]');
+            
+            bacaanRambuInput.addEventListener('input', () => {
+                calculateElevasiAktual(bacaanRambuInput, elevasiAktualInput);
+            });
+            
+            pointsContainer.appendChild(newPoint);
+        }
+        
+        function serializeFormData(form) {
+            const formData = new FormData(form);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            return data;
+        }
+
+        function displayReviewData(projectData, staData, pointsData) {
+            reviewStaSummary.innerHTML = `
+                <p><strong>Surveyor:</strong> ${projectData.surveyor}</p>
+                <p><strong>Lokasi Proyek:</strong> ${projectData.lokasi_proyek}</p>
+                <p><strong>STA:</strong> ${staData.titik_berdiri_alat_sta}</p>
+                <p><strong>HI:</strong> ${staData.calculated_hi}</p>
+            `;
+            let tableHtml = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Titik</th>
+                            <th>Bacaan Rambu</th>
+                            <th>Offset</th>
+                            <th>Elevasi Aktual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            pointsData.forEach((point, index) => {
+                tableHtml += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${point.nama_titik}</td>
+                        <td>${point.bacaan_rambu}</td>
+                        <td>${point.arah_offset} ${point.offset}</td>
+                        <td>${point.elevasi_aktual}</td>
+                    </tr>
+                `;
+            });
+            tableHtml += `</tbody></table>`;
+            reviewPointsTable.innerHTML = tableHtml;
+            drawPlot(pointsData);
+        }
+        
+        function drawPlot(pointsData) {
+            const ctx = plotCanvas.getContext('2d');
+            ctx.clearRect(0, 0, plotCanvas.width, plotCanvas.height);
+            if (pointsData.length === 0) {
+                ctx.fillText('Tidak ada data titik untuk diplot.', 10, 20);
+                return;
+            }
+
+            const sortedPoints = [...pointsData].sort((a, b) => parseFloat(a.offset) - parseFloat(b.offset));
+            
+            const offsets = sortedPoints.map(p => parseFloat(p.offset));
+            const elevations = sortedPoints.map(p => parseFloat(p.elevasi_aktual));
+            
+            const minOffset = Math.min(...offsets);
+            const maxOffset = Math.max(...offsets);
+            const minElevation = Math.min(...elevations);
+            const maxElevation = Math.max(...elevations);
+
+            const padding = 30;
+            const plotWidth = plotCanvas.width - 2 * padding;
+            const plotHeight = plotCanvas.height - 2 * padding;
+
+            function scaleX(offset) {
+                if (maxOffset - minOffset === 0) {
+                    return plotWidth / 2 + padding;
+                }
+                return padding + ((offset - minOffset) / (maxOffset - minOffset)) * plotWidth;
+            }
+
+            function scaleY(elevation) {
+                if (maxElevation - minElevation === 0) {
+                    return plotHeight / 2 + padding;
+                }
+                return plotHeight - ((elevation - minElevation) / (maxElevation - minElevation)) * plotHeight + padding;
+            }
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#007bff';
+            ctx.lineWidth = 2;
+            ctx.moveTo(scaleX(offsets[0]), scaleY(elevations[0]));
+            for (let i = 1; i < offsets.length; i++) {
+                ctx.lineTo(scaleX(offsets[i]), scaleY(elevations[i]));
+            }
+            ctx.stroke();
+
+            for (let i = 0; i < offsets.length; i++) {
+                ctx.beginPath();
+                ctx.arc(scaleX(offsets[i]), scaleY(elevations[i]), 4, 0, 2 * Math.PI);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+            }
+
+            ctx.font = '10px Arial';
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'center';
+            ctx.fillText('Offset', plotCanvas.width / 2, plotCanvas.height - 10);
+            ctx.textAlign = 'left';
+            ctx.fillText('Elevasi', 10, 20);
+        }
+        
+        function exportToCSV() {
+            if (!allData || !allData.points || allData.points.length === 0) {
+                alert('Tidak ada data poin untuk diekspor!');
+                return;
+            }
+
+            const header = 'No,Nama Titik,Jenis Observasi,Bacaan Rambu,Elevasi Aktual,Offset,Arah Offset,Keterangan\n';
+            let csvContent = header;
+
+            allData.points.forEach((point, index) => {
+                const row = `${index + 1},${point.nama_titik},${point.jenis_observasi},${point.bacaan_rambu},${point.elevasi_aktual},${point.offset},${point.arah_offset},${point.keterangan}\n`;
+                csvContent += row;
+            });
+
+            const filename = `data_ukur_${allData.sta.titik_berdiri_alat_sta}.csv`;
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+            
+            alert('Data berhasil diunduh dalam format CSV!');
+        }
+
+        // --- LOGIKA NAVIGASI & PENYIMPANAN DATA ---
+        
+        // Halaman 1 -> Halaman 2
+        projectForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            page1.classList.add('hidden');
+            page2.classList.remove('hidden');
+            calculateHI();
+        });
+        
+        // Halaman 2 -> Halaman 1
+        backToPage1Btn.addEventListener('click', function() {
+            page2.classList.add('hidden');
+            page1.classList.remove('hidden');
+        });
+        
+        // Halaman 2 -> Halaman 3
+        staForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            page2.classList.add('hidden');
+            page3.classList.remove('hidden');
+            
+            if (pointsContainer.children.length === 0) {
+                addPointEntry();
+            }
+        });
+        
+        // Halaman 3 -> Halaman 2
+        backToPage2Btn.addEventListener('click', function() {
+            page3.classList.add('hidden');
+            page2.classList.remove('hidden');
+        });
+        
+        // Halaman 4 -> Halaman 3
+        backToPage3Btn.addEventListener('click', function() {
+            page4.classList.add('hidden');
+            page3.classList.remove('hidden');
+        });
+        
+        // Tambahkan event listener untuk tombol "Tambah Titik"
+        addPointBtn.addEventListener('click', addPointEntry);
+        
+        // Perhitungan HI
+        elevasiBmTtpInput.addEventListener('input', calculateHI);
+        bsInput.addEventListener('input', calculateHI);
+    
+        // Logika Halaman 3 -> Halaman 4 (Review)
+        pointsForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const projectData = serializeFormData(projectForm);
+            const staData = serializeFormData(staForm);
+            
+            const pointsData = Array.from(pointsContainer.querySelectorAll('.point-entry')).map(pointEntry => {
+                const pointData = {};
+                const inputs = pointEntry.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    pointData[input.name] = input.value;
+                });
+                return pointData;
+            });
+            
+            allData = { project: projectData, sta: staData, points: pointsData };
+            
+            displayReviewData(projectData, staData, pointsData);
+            
+            page3.classList.add('hidden');
+            page4.classList.remove('hidden');
+        });
+        
+        // Logika untuk tombol "Unduh JSON"
+        submitDataBtn.addEventListener('click', function() {
+            const dataToSave = JSON.stringify(allData, null, 2);
+            localStorage.setItem('pengukuran_' + allData.sta.titik_berdiri_alat_sta, dataToSave);
+            
+            const filename = `data_ukur_${allData.sta.titik_berdiri_alat_sta}.json`;
+            const blob = new Blob([dataToSave], {type: 'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+            
+            alert('Data berhasil diunduh dalam format JSON!');
+        });
+        
+        // Logika untuk tombol "Unduh CSV"
+        exportCsvBtn.addEventListener('click', exportToCSV);
+    </script>
+</body>
+</html>
