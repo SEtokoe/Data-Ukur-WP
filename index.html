@@ -79,10 +79,12 @@
         .btn-group {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap; /* Allow wrapping for smaller screens */
         }
         .btn-group button {
             flex: 1;
             margin: 0;
+            min-width: 150px; /* Ensure buttons don't get too small */
         }
         .hidden {
             display: none;
@@ -93,6 +95,24 @@
             margin-top: 15px;
             border-radius: 4px;
             background-color: #f9f9f9;
+            position: relative;
+        }
+        .remove-point-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: auto;
+            margin: 0;
+        }
+        .remove-point-btn:hover {
+            background-color: #c82333;
         }
         .add-point-btn {
             background-color: #28a745;
@@ -130,6 +150,25 @@
             background-color: #fff;
             margin-top: 10px;
         }
+        .sta-list {
+            list-style: none;
+            padding: 0;
+        }
+        .sta-list li {
+            background-color: #e9ecef;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sta-list li button {
+            width: auto;
+            margin: 0;
+            padding: 5px 10px;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -151,38 +190,10 @@
                 <div class="form-group">
                     <label for="lokasi_proyek">Lokasi Proyek:</label>
                     <select id="lokasi_proyek" name="lokasi_proyek" required>
-                        <option value="">-- Pilih Lokasi Proyek --</option>
-                        <option value="D.I.R. Sukaraja">D.I.R. Sukaraja</option>
-                        <option value="D.I.R. Doros">D.I.R. Doros</option>
-                        <option value="D.I.R. Mulyaguna">D.I.R. Mulyaguna</option>
-                        <option value="D.I.R. Sukapulih">D.I.R. Sukapulih</option>
-                        <option value="D.I.R. Pulau Gemantung">D.I.R. Pulau Gemantung</option>
-                        <option value="D.I.R. Tanjung Beringin Trans">D.I.R. Tanjung Beringin Trans</option>
-                        <option value="D.I.R. Talang Cempedak">D.I.R. Talang Cempedak</option>
-                        <option value="D.I.R. Tanjung Serang">D.I.R. Tanjung Serang</option>
-                        <option value="D.I.R. Ulak Jermun">D.I.R. Ulak Jermun</option>
-                        <option value="D.I.R. Sidomulyo">D.I.R. Sidomulyo</option>
-                        <option value="D.I.R. Kayu Labu">D.I.R. Kayu Labu</option>
-                        <option value="D.I.R. Sungai Jeruju">D.I.R. Sungai Jeruju</option>
-                        <option value="D.I.R. Balam Jeruju">D.I.R. Balam Jeruju</option>
-                        <option value="D.I.R. Adil Makmur">D.I.R. Adil Makmur</option>
-                        <option value="D.I.R. Sungai Ketupak">D.I.R. Sungai Ketupak</option>
-                        <option value="D.I.R. Gajah Mukti">D.I.R. Gajah Mukti</option>
-                        <option value="D.I.R. Dewa Sibur">D.I.R. Dewa Sibur</option>
-                        <option value="D.I.R. Nata Sibur">D.I.R. Nata Sibur</option>
-                        <option value="D.I.R. Lebak Semendawai">D.I.R. Lebak Semendawai</option>
-                        <option value="D.I.R. Adumanis">D.I.R. Adumanis</option>
-                        <option value="D.I.R. Lebak Tobong">D.I.R. Lebak Tobong</option>
-                        <option value="D.I.R. Lebak Datuk">D.I.R. Lebak Datuk</option>
-                        <option value="D.I.R. Serudung">D.I.R. Serudung</option>
-                        <option value="D.I.R. Sungai Ulak Baru">D.I.R. Sungai Ulak Baru</option>
-                        <option value="D.I.R. Arisan Musi Timur">D.I.R. Arisan Musi Timur</option>
-                        <option value="D.I.R. Arisan Musi">D.I.R. Arisan Musi</option>
-                        <option value="D.I. Sungai Jerami">D.I. Sungai Jerami</option>
-                        <option value="D.I.R. Lingkis">D.I.R. Lingkis</option>
-                        <option value="D.I.R. Gedung Buruk">D.I.R. Gedung Buruk</option>
-                        <option value="D.I.R. Tanjung Sejaro">D.I.R. Tanjung Sejaro</option>
-                        <option value="D.I.R. Siring Alam">D.I.R. Siring Alam</option>
+                        <option value="">-- Pilih Proyek --</option>
+                        <option value="Proyek A">Proyek A</option>
+                        <option value="Proyek B">Proyek B</option>
+                        <option value="Proyek C">Proyek C</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -195,16 +206,15 @@
                         <option value="">-- Pilih Cuaca --</option>
                         <option value="Cerah">Cerah</option>
                         <option value="Mendung">Mendung</option>
-                        <option value="Gerimis">Gerimis</option>
-                        <option value="Hujan Sedang">Hujan Sedang</option>
-                        <option value="Hujan Lebat">Hujan Lebat</option>
+                        <option value="Hujan">Hujan</option>
+                        <option value="Berkabut">Berkabut</option>
                     </select>
                 </div>
             </fieldset>
             <button type="submit">Lanjutkan ke Set Up STA</button>
             <hr>
             <div class="form-group">
-                <label for="load-data-file">Atau muat data yang sudah ada:</label>
+                <label for="load-data-file">Atau muat data yang sudah ada (JSON):</label>
                 <input type="file" id="load-data-file" accept=".json">
             </div>
         </form>
@@ -246,54 +256,52 @@
                 </div>
             </fieldset>
             <button type="submit" id="start-points-btn">Mulai Input Titik Target</button>
-            <button type="button" id="back-to-page1" class="btn-secondary">Kembali</button>
+            <button type="button" id="back-to-page1" class="btn-secondary">Kembali ke Info Proyek</button>
         </form>
     </div>
 
     <div id="page3" class="container hidden">
-        <h1>Input Titik Target</h1>
+        <h1>Input Titik Target <span id="current-sta-name"></span></h1>
         <p>Tambahkan titik target untuk STA ini.</p>
         <form id="points-form">
             <div id="points-container">
             </div>
             <button type="button" id="add-point-btn" class="add-point-btn">+ Tambah Titik</button>
-            <button type="submit" id="review-btn">Selesai STA Ini & Lanjutkan ke Cek & Ricek</button>
-            <button type="button" id="back-to-page2" class="btn-secondary">Kembali</button>
+            <button type="submit" id="save-sta-btn">Selesaikan STA Ini</button>
+            <button type="button" id="back-to-page2" class="btn-secondary">Kembali ke Set Up STA</button>
         </form>
     </div>
 
     <div id="page4" class="container hidden">
-        <h1>Cek & Ricek Data Ukur</h1>
-        <p>Review ringkasan data dan sketsa sebelum mengirim.</p>
+        <h1>Ringkasan Proyek</h1>
+        <p>Proyek: <strong id="review-project-name"></strong></p>
 
         <div class="review-section">
-            <h2>Ringkasan STA</h2>
-            <div id="review-sta-summary">
-            </div>
+            <h2>Daftar STA dalam Proyek Ini</h2>
+            <ul id="sta-list-summary" class="sta-list">
+                </ul>
         </div>
 
         <div class="review-section">
-            <h2>Sketsa Profil Cross-Section</h2>
+            <h2>Sketsa Profil Cross-Section (STA Terakhir)</h2>
             <canvas id="cross-section-plot"></canvas>
-        </div>
-
-        <div class="review-section">
-            <h2>Ringkasan Titik Target</h2>
             <div id="review-points-table">
-            </div>
+                </div>
         </div>
 
         <div class="btn-group">
-            <button type="button" id="back-to-page3">Kembali untuk Edit</button>
-            <button type="button" id="export-csv-btn" class="btn-secondary">Unduh CSV</button>
-            <button type="button" id="submit-data-btn" class="add-point-btn">Unduh JSON</button>
-            <button type="button" id="start-new-btn" class="add-point-btn">Mulai Pengukuran Baru</button>
+            <button type="button" id="back-to-last-sta-edit">Kembali untuk Edit STA Terakhir</button>
+            <button type="button" id="add-new-sta-btn" class="add-point-btn">Tambahkan STA Baru</button>
+            <button type="button" id="export-project-csv-btn" class="btn-secondary">Unduh Proyek Lengkap (CSV)</button>
+            <button type="button" id="export-project-json-btn" class="add-point-btn">Unduh Proyek Lengkap (JSON)</button>
+            <button type="button" id="start-new-project-btn" class="add-point-btn">Mulai Proyek Baru</button>
             <button type="button" id="exit-btn" class="btn-secondary">Keluar Aplikasi</button>
         </div>
     </div>
 
     <template id="point-template">
         <div class="point-entry">
+            <button type="button" class="remove-point-btn">Hapus Titik</button>
             <legend>Titik Target <span class="point-number">1</span></legend>
             <div class="form-group">
                 <label>Nama Titik Target:</label>
@@ -359,11 +367,13 @@
         
         const backToPage1Btn = document.getElementById('back-to-page1');
         const backToPage2Btn = document.getElementById('back-to-page2');
-        const backToPage3Btn = document.getElementById('back-to-page3');
+        const backToLastStaEditBtn = document.getElementById('back-to-last-sta-edit'); // Renamed
         const addPointBtn = document.getElementById('add-point-btn');
-        const submitDataBtn = document.getElementById('submit-data-btn');
-        const exportCsvBtn = document.getElementById('export-csv-btn');
-        const startNewBtn = document.getElementById('start-new-btn');
+        const saveStaBtn = document.getElementById('save-sta-btn'); // Renamed
+        const addNewStaBtn = document.getElementById('add-new-sta-btn'); // New
+        const exportProjectCsvBtn = document.getElementById('export-project-csv-btn'); // New
+        const exportProjectJsonBtn = document.getElementById('export-project-json-btn'); // New
+        const startNewProjectBtn = document.getElementById('start-new-project-btn'); // Renamed
         const exitBtn = document.getElementById('exit-btn');
         
         const loadDataFile = document.getElementById('load-data-file');
@@ -374,13 +384,21 @@
         const bsInput = document.getElementById('bs');
         const calculatedHiInput = document.getElementById('calculated_hi');
 
-        const reviewStaSummary = document.getElementById('review-sta-summary');
+        const currentStaNameSpan = document.getElementById('current-sta-name'); // New
+        const reviewProjectName = document.getElementById('review-project-name'); // New
+        const staListSummary = document.getElementById('sta-list-summary'); // New
         const reviewPointsTable = document.getElementById('review-points-table');
         const plotCanvas = document.getElementById('cross-section-plot');
 
-        // --- FUNGSI PERHITUNGAN & LOGIKA UTAMA ---
+        // --- GLOBAL DATA & STATE ---
+        let allData = {
+            project: {},
+            stas: []
+        };
         let calculatedHI = 0;
-        let allData = {};
+        let currentStaIndex = -1; // To track which STA is being edited/added
+
+        // --- HELPER FUNCTIONS ---
 
         function calculateHI() {
             const elevasiBmTtp = parseFloat(elevasiBmTtpInput.value) || 0;
@@ -398,14 +416,23 @@
 
         function addPointEntry(pointData = null) {
             const newPoint = pointTemplate.content.cloneNode(true);
-            const pointNumber = pointsContainer.children.length + 1;
-            newPoint.querySelector('.point-number').textContent = pointNumber;
+            const pointEntryDiv = newPoint.querySelector('.point-entry');
+            const pointNumberSpan = newPoint.querySelector('.point-number');
+            const removeBtn = newPoint.querySelector('.remove-point-btn');
+
+            const currentPointCount = pointsContainer.children.length;
+            pointNumberSpan.textContent = currentPointCount + 1; // Update immediately
             
             const bacaanRambuInput = newPoint.querySelector('input[name="bacaan_rambu"]');
             const elevasiAktualInput = newPoint.querySelector('input[name="elevasi_aktual"]');
             
             bacaanRambuInput.addEventListener('input', () => {
                 calculateElevasiAktual(bacaanRambuInput, elevasiAktualInput);
+            });
+
+            removeBtn.addEventListener('click', () => {
+                pointsContainer.removeChild(pointEntryDiv);
+                updatePointNumbers(); // Recalculate numbers after removal
             });
             
             if (pointData) {
@@ -415,12 +442,23 @@
                 newPoint.querySelector('input[name="offset"]').value = pointData.offset;
                 newPoint.querySelector('select[name="arah_offset"]').value = pointData.arah_offset;
                 newPoint.querySelector('input[name="keterangan"]').value = pointData.keterangan;
-                // Calculate elevasi aktual for loaded data
-                const elevasiAktual = calculatedHI - parseFloat(pointData.bacaan_rambu);
-                elevasiAktualInput.value = elevasiAktual.toFixed(3);
+                
+                // Calculate elevasi aktual for loaded data, ensuring HI is set
+                // This needs to be done AFTER HI is calculated if loading STA
+                if (calculatedHI !== 0) { // Only calculate if HI is already determined
+                    const elevasiAktual = calculatedHI - parseFloat(pointData.bacaan_rambu);
+                    elevasiAktualInput.value = elevasiAktual.toFixed(3);
+                }
             }
 
             pointsContainer.appendChild(newPoint);
+            updatePointNumbers(); // Update numbers after adding
+        }
+
+        function updatePointNumbers() {
+            Array.from(pointsContainer.children).forEach((entry, index) => {
+                entry.querySelector('.point-number').textContent = index + 1;
+            });
         }
 
         function fillForm(form, data) {
@@ -441,49 +479,92 @@
             return data;
         }
 
-        function displayReviewData(projectData, staData, pointsData) {
-            reviewStaSummary.innerHTML = `
-                <p><strong>Surveyor:</strong> ${projectData.surveyor}</p>
-                <p><strong>Lokasi Proyek:</strong> ${projectData.lokasi_proyek}</p>
-                <p><strong>STA:</strong> ${staData.titik_berdiri_alat_sta}</p>
-                <p><strong>HI:</strong> ${staData.calculated_hi}</p>
-            `;
+        function displayProjectSummary() {
+            reviewProjectName.textContent = allData.project.item_pekerjaan || allData.project.lokasi_proyek || 'Proyek Tanpa Nama';
+            
+            staListSummary.innerHTML = ''; // Clear previous list
+            if (allData.stas.length === 0) {
+                staListSummary.innerHTML = '<li>Belum ada STA yang ditambahkan.</li>';
+                plotCanvas.getContext('2d').clearRect(0, 0, plotCanvas.width, plotCanvas.height);
+                reviewPointsTable.innerHTML = 'Tidak ada data titik untuk ditampilkan.';
+                return;
+            }
+
+            allData.stas.forEach((staEntry, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <span>STA: ${staEntry.sta.titik_berdiri_alat_sta || 'N/A'} (HI: ${parseFloat(staEntry.sta.calculated_hi).toFixed(3) || 'N/A'})</span>
+                    <button type="button" data-sta-index="${index}" class="btn-secondary view-sta-details">Lihat Detail</button>
+                `;
+                staListSummary.appendChild(listItem);
+            });
+
+            // Add event listeners for "Lihat Detail" buttons
+            document.querySelectorAll('.view-sta-details').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.staIndex);
+                    displayDetailedSta(allData.stas[index]);
+                });
+            });
+
+            // Display details for the last STA by default
+            displayDetailedSta(allData.stas[allData.stas.length - 1]);
+        }
+
+        function displayDetailedSta(staEntry) {
             let tableHtml = `
+                <h3>Detail Titik Target STA: ${staEntry.sta.titik_berdiri_alat_sta}</h3>
                 <table>
                     <thead>
                         <tr>
                             <th>No.</th>
                             <th>Titik</th>
+                            <th>Jenis Obs.</th>
                             <th>Bacaan Rambu</th>
                             <th>Offset</th>
+                            <th>Arah Offset</th>
                             <th>Elevasi Aktual</th>
+                            <th>Keterangan</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
-            pointsData.forEach((point, index) => {
+            staEntry.points.forEach((point, index) => {
                 tableHtml += `
                     <tr>
                         <td>${index + 1}</td>
                         <td>${point.nama_titik}</td>
+                        <td>${point.jenis_observasi}</td>
                         <td>${point.bacaan_rambu}</td>
-                        <td>${point.arah_offset} ${point.offset}</td>
+                        <td>${point.offset}</td>
+                        <td>${point.arah_offset}</td>
                         <td>${point.elevasi_aktual}</td>
+                        <td>${point.keterangan}</td>
                     </tr>
                 `;
             });
             tableHtml += `</tbody></table>`;
             reviewPointsTable.innerHTML = tableHtml;
-            drawPlot(pointsData);
+            drawPlot(staEntry.points);
         }
         
         function drawPlot(pointsData) {
             const ctx = plotCanvas.getContext('2d');
             ctx.clearRect(0, 0, plotCanvas.width, plotCanvas.height);
-            if (pointsData.length === 0) {
+            if (!pointsData || pointsData.length === 0) {
                 ctx.fillText('Tidak ada data titik untuk diplot.', 10, 20);
                 return;
             }
+
+            // Ensure elevations are calculated if not already (e.g., after loading)
+            // This is crucial if loading an existing project and then viewing STA details
+            const staHi = allData.stas.length > 0 ? parseFloat(allData.stas[allData.stas.length - 1].sta.calculated_hi) : calculatedHI;
+
+            pointsData.forEach(point => {
+                if (!point.elevasi_aktual && point.bacaan_rambu && staHi !== 0) {
+                     point.elevasi_aktual = (staHi - parseFloat(point.bacaan_rambu)).toFixed(3);
+                }
+            });
 
             const sortedPoints = [...pointsData].sort((a, b) => parseFloat(a.offset) - parseFloat(b.offset));
             
@@ -510,6 +591,7 @@
                 if (maxElevation - minElevation === 0) {
                     return plotHeight / 2 + padding;
                 }
+                // Invert Y axis for plot: higher elevation means higher on screen
                 return plotHeight - ((elevation - minElevation) / (maxElevation - minElevation)) * plotHeight + padding;
             }
 
@@ -524,226 +606,4 @@
 
             for (let i = 0; i < offsets.length; i++) {
                 ctx.beginPath();
-                ctx.arc(scaleX(offsets[i]), scaleY(elevations[i]), 4, 0, 2 * Math.PI);
-                ctx.fillStyle = 'red';
-                ctx.fill();
-            }
-
-            ctx.font = '10px Arial';
-            ctx.fillStyle = '#333';
-            ctx.textAlign = 'center';
-            ctx.fillText('Offset', plotCanvas.width / 2, plotCanvas.height - 10);
-            ctx.textAlign = 'left';
-            ctx.fillText('Elevasi', 10, 20);
-        }
-        
-        function generateFilename(extension) {
-            const date = allData.project.tanggal_pengukuran;
-            const location = allData.project.lokasi_proyek;
-            const sta = allData.sta.titik_berdiri_alat_sta;
-            // Ganti spasi dengan underscore untuk nama file
-            const filename = `${date}_${location.replace(/\s/g, '_')}_${sta.replace(/\s/g, '_')}.${extension}`;
-            return filename;
-        }
-
-        function exportToCSV() {
-            if (!allData || !allData.points || allData.points.length === 0) {
-                alert('Tidak ada data poin untuk diekspor!');
-                return;
-            }
-            
-            let csvContent = "data:text/csv;charset=utf-8,";
-            
-            // Tambahkan header informasi proyek & STA
-            csvContent += "Informasi Proyek,,\n";
-            csvContent += `Surveyor,${allData.project.surveyor},\n`;
-            csvContent += `Tanggal Pengukuran,${allData.project.tanggal_pengukuran},\n`;
-            csvContent += `Lokasi Proyek,${allData.project.lokasi_proyek},\n`;
-            csvContent += `Item Pekerjaan,${allData.project.item_pekerjaan},\n`;
-            csvContent += `Kondisi Cuaca,${allData.project.kondisi_cuaca},\n\n`;
-
-            csvContent += "Informasi STA,,\n";
-            csvContent += `Alat Waterpass,${allData.sta.alat_waterpass},\n`;
-            csvContent += `Nomor Seri Alat,${allData.sta.nomor_seri_alat},\n`;
-            csvContent += `Titik Berdiri Alat (STA),${allData.sta.titik_berdiri_alat_sta},\n`;
-            csvContent += `BM/TTP,${allData.sta.bm_ttp},\n`;
-            csvContent += `Bacaan Rambu BS,${allData.sta.bs},\n`;
-            csvContent += `Elevasi BM/TTP,${allData.sta.elevasi_bm_ttp},\n`;
-            csvContent += `Calculated HI,${allData.sta.calculated_hi},\n\n`;
-
-            // Tambahkan header tabel titik
-            const header = 'No,Nama Titik,Jenis Observasi,Bacaan Rambu,Elevasi Aktual,Offset,Arah Offset,Keterangan\n';
-            csvContent += header;
-
-            // Tambahkan data titik
-            allData.points.forEach((point, index) => {
-                const row = `${index + 1},${point.nama_titik},${point.jenis_observasi},${point.bacaan_rambu},${point.elevasi_aktual},${point.offset},${point.arah_offset},${point.keterangan}\n`;
-                csvContent += row;
-            });
-
-            const filename = generateFilename('csv');
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement('a');
-            link.setAttribute('href', encodedUri);
-            link.setAttribute('download', filename);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            alert('Data berhasil diunduh dalam format CSV!');
-        }
-
-        function resetForms() {
-            projectForm.reset();
-            staForm.reset();
-            pointsContainer.innerHTML = '';
-            addPointEntry(); // Tambahkan satu titik kosong
-            allData = {};
-        }
-
-        function startNewMeasurement() {
-            resetForms();
-            page4.classList.add('hidden');
-            page1.classList.remove('hidden');
-            calculatedHI = 0;
-            calculatedHiInput.value = '';
-        }
-
-        function exitApplication() {
-            alert('Untuk keluar dari aplikasi, silakan tutup jendela ini secara manual.');
-        }
-
-        function loadDataFromFile() {
-            const file = loadDataFile.files[0];
-            if (!file) {
-                alert('Pilih file JSON terlebih dahulu.');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    allData = JSON.parse(event.target.result);
-                    
-                    // Isi formulir proyek
-                    fillForm(projectForm, allData.project);
-                    
-                    // Isi formulir STA
-                    fillForm(staForm, allData.sta);
-                    calculateHI(); // Hitung ulang HI setelah data terisi
-
-                    // Hapus titik lama dan isi titik baru
-                    pointsContainer.innerHTML = '';
-                    allData.points.forEach(point => addPointEntry(point));
-                    
-                    // Pindah ke halaman input titik untuk diedit
-                    page1.classList.add('hidden');
-                    page3.classList.remove('hidden');
-                    alert('Data berhasil dimuat. Anda sekarang dapat mengedit data titik.');
-                    
-                } catch (e) {
-                    alert('Gagal memuat file. Pastikan file yang Anda pilih adalah file JSON yang valid.');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        // --- LOGIKA NAVIGASI & PENYIMPANAN DATA ---
-        
-        // Halaman 1 -> Halaman 2
-        projectForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            page1.classList.add('hidden');
-            page2.classList.remove('hidden');
-            calculateHI();
-        });
-        
-        // Halaman 2 -> Halaman 1
-        backToPage1Btn.addEventListener('click', function() {
-            page2.classList.add('hidden');
-            page1.classList.remove('hidden');
-        });
-        
-        // Halaman 2 -> Halaman 3
-        staForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            page2.classList.add('hidden');
-            page3.classList.remove('hidden');
-            
-            if (pointsContainer.children.length === 0) {
-                addPointEntry();
-            }
-        });
-        
-        // Halaman 3 -> Halaman 2
-        backToPage2Btn.addEventListener('click', function() {
-            page3.classList.add('hidden');
-            page2.classList.remove('hidden');
-        });
-        
-        // Halaman 4 -> Halaman 3
-        backToPage3Btn.addEventListener('click', function() {
-            page4.classList.add('hidden');
-            page3.classList.remove('hidden');
-        });
-        
-        // Tambahkan event listener untuk tombol "Tambah Titik"
-        addPointBtn.addEventListener('click', addPointEntry);
-        
-        // Event listener untuk tombol "Muat Data"
-        loadDataFile.addEventListener('change', loadDataFromFile);
-
-        // Perhitungan HI
-        elevasiBmTtpInput.addEventListener('input', calculateHI);
-        bsInput.addEventListener('input', calculateHI);
-    
-        // Logika Halaman 3 -> Halaman 4 (Review)
-        pointsForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const projectData = serializeFormData(projectForm);
-            const staData = serializeFormData(staForm);
-            
-            const pointsData = Array.from(pointsContainer.querySelectorAll('.point-entry')).map(pointEntry => {
-                const pointData = {};
-                const inputs = pointEntry.querySelectorAll('input, select');
-                inputs.forEach(input => {
-                    pointData[input.name] = input.value;
-                });
-                return pointData;
-            });
-            
-            allData = { project: projectData, sta: staData, points: pointsData };
-            
-            displayReviewData(projectData, staData, pointsData);
-            
-            page3.classList.add('hidden');
-            page4.classList.remove('hidden');
-        });
-        
-        // Logika untuk tombol "Unduh JSON"
-        submitDataBtn.addEventListener('click', function() {
-            const dataToSave = JSON.stringify(allData, null, 2);
-            localStorage.setItem('pengukuran_' + allData.sta.titik_berdiri_alat_sta, dataToSave);
-            
-            const filename = generateFilename('json');
-            const blob = new Blob([dataToSave], {type: 'application/json'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = filename;
-            a.click();
-            
-            alert('Data berhasil diunduh dalam format JSON!');
-        });
-        
-        // Logika untuk tombol "Unduh CSV"
-        exportCsvBtn.addEventListener('click', exportToCSV);
-
-        // Logika untuk tombol "Mulai Pengukuran Baru"
-        startNewBtn.addEventListener('click', startNewMeasurement);
-
-        // Logika untuk tombol "Keluar Aplikasi"
-        exitBtn.addEventListener('click', exitApplication);
-    </script>
-</body>
-</html>
+                ctx.arc(scaleX(
