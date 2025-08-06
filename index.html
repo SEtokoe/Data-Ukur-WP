@@ -190,7 +190,7 @@
                 <div class="form-group">
                     <label for="lokasi_proyek">Lokasi Proyek:</label>
                     <select id="lokasi_proyek" name="lokasi_proyek" required>
-                        <option value="">-- Pilih Proyek --</option>
+                        <option value="">-- Pilih Lokasi Proyek --</option>
                         <option value="D.I.R. Sukaraja">D.I.R. Sukaraja</option>
                         <option value="D.I.R. Doros">D.I.R. Doros</option>
                         <option value="D.I.R. Mulyaguna">D.I.R. Mulyaguna</option>
@@ -396,13 +396,13 @@
         
         const backToPage1Btn = document.getElementById('back-to-page1');
         const backToPage2Btn = document.getElementById('back-to-page2');
-        const backToLastStaEditBtn = document.getElementById('back-to-last-sta-edit'); // Renamed
+        const backToLastStaEditBtn = document.getElementById('back-to-last-sta-edit'); 
         const addPointBtn = document.getElementById('add-point-btn');
-        const saveStaBtn = document.getElementById('save-sta-btn'); // Renamed
-        const addNewStaBtn = document.getElementById('add-new-sta-btn'); // New
-        const exportProjectCsvBtn = document.getElementById('export-project-csv-btn'); // New
-        const exportProjectJsonBtn = document.getElementById('export-project-json-btn'); // New
-        const startNewProjectBtn = document.getElementById('start-new-project-btn'); // Renamed
+        const saveStaBtn = document.getElementById('save-sta-btn'); 
+        const addNewStaBtn = document.getElementById('add-new-sta-btn'); 
+        const exportProjectCsvBtn = document.getElementById('export-project-csv-btn'); 
+        const exportProjectJsonBtn = document.getElementById('export-project-json-btn'); 
+        const startNewProjectBtn = document.getElementById('start-new-project-btn'); 
         const exitBtn = document.getElementById('exit-btn');
         
         const loadDataFile = document.getElementById('load-data-file');
@@ -413,9 +413,9 @@
         const bsInput = document.getElementById('bs');
         const calculatedHiInput = document.getElementById('calculated_hi');
 
-        const currentStaNameSpan = document.getElementById('current-sta-name'); // New
-        const reviewProjectName = document.getElementById('review-project-name'); // New
-        const staListSummary = document.getElementById('sta-list-summary'); // New
+        const currentStaNameSpan = document.getElementById('current-sta-name'); 
+        const reviewProjectName = document.getElementById('review-project-name'); 
+        const staListSummary = document.getElementById('sta-list-summary'); 
         const reviewPointsTable = document.getElementById('review-points-table');
         const plotCanvas = document.getElementById('cross-section-plot');
 
@@ -574,10 +574,10 @@
             });
             tableHtml += `</tbody></table>`;
             reviewPointsTable.innerHTML = tableHtml;
-            drawPlot(staEntry.points);
+            drawPlot(staEntry.points, parseFloat(staEntry.sta.calculated_hi)); // Pass HI for plotting
         }
         
-        function drawPlot(pointsData) {
+        function drawPlot(pointsData, hiForPlot) {
             const ctx = plotCanvas.getContext('2d');
             ctx.clearRect(0, 0, plotCanvas.width, plotCanvas.height);
             if (!pointsData || pointsData.length === 0) {
@@ -586,12 +586,9 @@
             }
 
             // Ensure elevations are calculated if not already (e.g., after loading)
-            // This is crucial if loading an existing project and then viewing STA details
-            const staHi = allData.stas.length > 0 ? parseFloat(allData.stas[allData.stas.length - 1].sta.calculated_hi) : calculatedHI;
-
             pointsData.forEach(point => {
-                if (!point.elevasi_aktual && point.bacaan_rambu && staHi !== 0) {
-                     point.elevasi_aktual = (staHi - parseFloat(point.bacaan_rambu)).toFixed(3);
+                if (!point.elevasi_aktual && point.bacaan_rambu && hiForPlot !== 0) {
+                     point.elevasi_aktual = (hiForPlot - parseFloat(point.bacaan_rambu)).toFixed(3);
                 }
             });
 
@@ -635,4 +632,355 @@
 
             for (let i = 0; i < offsets.length; i++) {
                 ctx.beginPath();
-                ctx.arc(scaleX(
+                ctx.arc(scaleX(offsets[i]), scaleY(elevations[i]), 4, 0, 2 * Math.PI);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+            }
+
+            ctx.font = '10px Arial';
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'center';
+            ctx.fillText('Offset', plotCanvas.width / 2, plotCanvas.height - 10);
+            ctx.textAlign = 'left';
+            ctx.fillText('Elevasi', 10, 20);
+        }
+        
+        function formatTanggal(dateString) {
+            // dateString is YYYY-MM-DD
+            const parts = dateString.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1]}-${parts[0]}`; // DD-MM-YYYY
+            }
+            return dateString; // Fallback if format is unexpected
+        }
+
+        function generateProjectFilename(extension) {
+            const surveyor = allData.project.surveyor.replace(/[^a-zA-Z0-9]/g, '_'); // Sanitize filename
+            const location = allData.project.lokasi_proyek.replace(/[^a-zA-Z0-9]/g, '_');
+            const formattedDate = formatTanggal(allData.project.tanggal_pengukuran); // Use formatted date
+            return `${surveyor}_${location}_${formattedDate}.${extension}`;
+        }
+
+        function exportFullProjectToCSV() {
+            if (!allData.stas || allData.stas.length === 0) {
+                alert('Tidak ada data proyek untuk diekspor!');
+                return;
+            }
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Project Information Header
+            csvContent += "INFORMASI PROYEK,,\n";
+            csvContent += `Surveyor,${allData.project.surveyor},\n`;
+            csvContent += `Tanggal Pengukuran,${formatTanggal(allData.project.tanggal_pengukuran)},\n`; // Use formatted date
+            csvContent += `Lokasi Proyek,${allData.project.lokasi_proyek},\n`;
+            csvContent += `Item Pekerjaan/Area,${allData.project.item_pekerjaan},\n`;
+            csvContent += `Kondisi Cuaca,${allData.project.kondisi_cuaca},\n\n`;
+
+            allData.stas.forEach((staEntry, staIndex) => {
+                // STA Information Header
+                csvContent += `INFORMASI STA ${staIndex + 1},,\n`;
+                csvContent += `Alat Waterpass,${staEntry.sta.alat_waterpass},\n`;
+                csvContent += `Nomor Seri Alat,${staEntry.sta.nomor_seri_alat},\n`;
+                csvContent += `Titik Berdiri Alat (STA),${staEntry.sta.titik_berdiri_alat_sta},\n`;
+                csvContent += `BM/TTP,${staEntry.sta.bm_ttp},\n`;
+                csvContent += `Bacaan Rambu BS,${staEntry.sta.bs},\n`;
+                csvContent += `Elevasi BM/TTP,${staEntry.sta.elevasi_bm_ttp},\n`;
+                csvContent += `Calculated HI,${staEntry.sta.calculated_hi},\n\n`;
+
+                // Points Table Header for this STA
+                csvContent += `DATA TITIK STA ${staIndex + 1},,,,,,\n`;
+                csvContent += 'No,Nama Titik,Jenis Observasi,Bacaan Rambu,Elevasi Aktual,Offset,Arah Offset,Keterangan\n';
+
+                // Points Data for this STA
+                staEntry.points.forEach((point, pointIndex) => {
+                    const row = `${pointIndex + 1},${point.nama_titik},${point.jenis_observasi},${point.bacaan_rambu},${point.elevasi_aktual},${point.offset},${point.arah_offset},${point.keterangan}\n`;
+                    csvContent += row;
+                });
+                csvContent += '\n'; // Add a blank line between STAs for readability
+            });
+
+            const filename = generateProjectFilename('csv');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('Data proyek lengkap berhasil diunduh dalam format CSV!');
+        }
+
+        function exportFullProjectToJSON() {
+            if (!allData.stas || allData.stas.length === 0) {
+                alert('Tidak ada data proyek untuk diekspor!');
+                return;
+            }
+
+            const dataToSave = JSON.stringify(allData, null, 2);
+            const filename = generateProjectFilename('json');
+            const blob = new Blob([dataToSave], {type: 'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+            
+            alert('Data proyek lengkap berhasil diunduh dalam format JSON!');
+        }
+
+
+        function resetForms() {
+            projectForm.reset();
+            staForm.reset();
+            pointsContainer.innerHTML = '';
+            // Don't add a default point when starting new project, only when starting new STA
+            allData = { project: {}, stas: [] };
+            calculatedHI = 0;
+            calculatedHiInput.value = '';
+            currentStaIndex = -1;
+            saveAllDataToLocalStorage();
+        }
+
+        function startNewProject() {
+            resetForms();
+            page4.classList.add('hidden');
+            page1.classList.remove('hidden');
+        }
+
+        function exitApplication() {
+            alert('Untuk keluar dari aplikasi, silakan tutup jendela ini secara manual.');
+        }
+
+        function saveAllDataToLocalStorage() {
+            try {
+                localStorage.setItem('pengukuran_project_data', JSON.stringify(allData));
+                console.log('Project data saved to Local Storage.');
+            } catch (e) {
+                console.error('Failed to save data to Local Storage:', e);
+                alert('Gagal menyimpan data ke penyimpanan lokal. Pastikan ruang penyimpanan tersedia.');
+            }
+        }
+
+        function loadAllDataFromLocalStorage() {
+            try {
+                const savedData = localStorage.getItem('pengukuran_project_data');
+                if (savedData) {
+                    allData = JSON.parse(savedData);
+                    console.log('Project data loaded from Local Storage.');
+                    
+                    // Check if project data exists
+                    if (allData.project && Object.keys(allData.project).length > 0) {
+                        fillForm(projectForm, allData.project); // Fill project form regardless
+                        
+                        // If STAs exist, go to review page
+                        if (allData.stas && allData.stas.length > 0) {
+                            displayProjectSummary();
+                            page1.classList.add('hidden');
+                            page4.classList.remove('hidden');
+                            alert('Proyek Anda sebelumnya berhasil dimuat dari penyimpanan lokal. Anda dapat melanjutkan atau mengunduh data.');
+                        } else {
+                            // If project data exists but no STAs, go to STA setup (Page 2)
+                            page1.classList.add('hidden');
+                            page2.classList.remove('hidden');
+                            alert('Proyek Anda sebelumnya berhasil dimuat. Silakan mulai STA pertama.');
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load data from Local Storage:', e);
+                alert('Gagal memuat data dari penyimpanan lokal. Data mungkin rusak atau tidak ada.');
+            }
+        }
+
+        function loadDataFromFile() {
+            const file = loadDataFile.files[0];
+            if (!file) {
+                alert('Pilih file JSON terlebih dahulu.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const loadedData = JSON.parse(event.target.result);
+                    // Validate if it's a valid project structure
+                    if (loadedData.project && loadedData.stas && Array.isArray(loadedData.stas)) {
+                        allData = loadedData;
+                        saveAllDataToLocalStorage(); // Save loaded data to local storage for persistence
+                        
+                        fillForm(projectForm, allData.project);
+                        displayProjectSummary();
+                        
+                        page1.classList.add('hidden');
+                        page4.classList.remove('hidden');
+                        alert('Data proyek lengkap berhasil dimuat dari file. Anda sekarang dapat melanjutkan atau mengunduh data.');
+                        
+                    } else {
+                        alert('Format file JSON tidak valid untuk proyek pengukuran ini.');
+                    }
+                } catch (e) {
+                    alert('Gagal memuat file. Pastikan file yang Anda pilih adalah file JSON yang valid.');
+                    console.error('File load error:', e);
+                }
+            };
+            reader.readAsText(file);
+            loadDataFile.value = ''; // Clear file input after loading
+        }
+
+        function loadStaForEdit(staEntry, index) {
+            currentStaIndex = index;
+            fillForm(staForm, staEntry.sta);
+            // Calculate HI for the loaded STA
+            calculatedHI = parseFloat(staEntry.sta.calculated_hi); // Ensure HI is correctly set from loaded data
+            calculatedHiInput.value = calculatedHI.toFixed(3); // Update display
+
+            pointsContainer.innerHTML = ''; // Clear existing points
+            staEntry.points.forEach(point => addPointEntry(point)); // Add points, calculating actual elevations
+
+            currentStaNameSpan.textContent = staEntry.sta.titik_berdiri_alat_sta;
+            page4.classList.add('hidden');
+            page3.classList.remove('hidden');
+            alert('STA ' + staEntry.sta.titik_berdiri_alat_sta + ' dimuat untuk diedit.');
+        }
+
+        // --- EVENT LISTENERS & NAVIGATION LOGIC ---
+        
+        // Initial load check for local storage data
+        window.addEventListener('load', loadAllDataFromLocalStorage);
+
+        // Page 1 (Project Info) -> Page 2 (STA Setup)
+        projectForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            // Save project data when moving to STA setup
+            allData.project = serializeFormData(projectForm);
+            saveAllDataToLocalStorage();
+            
+            page1.classList.add('hidden');
+            page2.classList.remove('hidden');
+            
+            // If starting a new STA after previously loading a project with STAs, clear staForm
+            // This is handled by currentStaIndex = -1 when starting a new STA or new project
+            if (currentStaIndex === -1 && Object.keys(staForm).length > 0) { // Check if staForm has values
+                 staForm.reset();
+                 pointsContainer.innerHTML = '';
+                 calculatedHI = 0;
+                 calculatedHiInput.value = '';
+            } else {
+                 calculateHI(); // Calculate HI initially for new STA or if editing an existing one
+            }
+        });
+        
+        // Page 2 (STA Setup) -> Page 1 (Project Info)
+        backToPage1Btn.addEventListener('click', function() {
+            page2.classList.add('hidden');
+            page1.classList.remove('hidden');
+        });
+        
+        // Page 2 (STA Setup) -> Page 3 (Input Titik Target)
+        staForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            // The STA data is saved temporarily. It will be added to allData.stas on page3 submission
+            
+            // Set current STA name for display on Page 3
+            currentStaNameSpan.textContent = staForm.titik_berdiri_alat_sta.value;
+
+            page2.classList.add('hidden');
+            page3.classList.remove('hidden');
+            
+            // If it's a new STA or no points are currently loaded, add an empty point entry
+            if (pointsContainer.children.length === 0) {
+                addPointEntry();
+            }
+        });
+        
+        // Page 3 (Input Titik Target) -> Page 2 (STA Setup)
+        backToPage2Btn.addEventListener('click', function() {
+            page3.classList.add('hidden');
+            page2.classList.remove('hidden');
+        });
+        
+        // Page 4 (Review) -> Page 3 (Input Titik Target - last STA)
+        backToLastStaEditBtn.addEventListener('click', function() {
+            if (allData.stas.length > 0) {
+                const lastStaIndex = allData.stas.length - 1;
+                loadStaForEdit(allData.stas[lastStaIndex], lastStaIndex);
+            } else {
+                alert('Tidak ada STA untuk diedit. Memulai STA baru.');
+                staForm.reset();
+                pointsContainer.innerHTML = '';
+                addPointEntry(); // Add first point for new STA
+                calculatedHI = 0;
+                calculatedHiInput.value = '';
+                currentStaIndex = -1;
+                page4.classList.add('hidden');
+                page2.classList.remove('hidden');
+            }
+        });
+        
+        // Add event listener for "Tambah Titik"
+        addPointBtn.addEventListener('click', addPointEntry);
+        
+        // Event listener for "Muat Data" file input
+        loadDataFile.addEventListener('change', loadDataFromFile);
+
+        // Recalculate HI on input change
+        elevasiBmTtpInput.addEventListener('input', calculateHI);
+        bsInput.addEventListener('input', calculateHI);
+    
+        // Logika Page 3 (Input Titik Target) -> Page 4 (Review Project Summary)
+        saveStaBtn.addEventListener('click', function(event) { 
+            event.preventDefault();
+            
+            const staData = serializeFormData(staForm);
+            const pointsData = Array.from(pointsContainer.querySelectorAll('.point-entry')).map(pointEntry => {
+                const pointData = {};
+                const inputs = pointEntry.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    pointData[input.name] = input.value;
+                });
+                return pointData;
+            });
+            
+            const currentStaEntry = { sta: staData, points: pointsData };
+
+            if (currentStaIndex === -1) { // New STA
+                allData.stas.push(currentStaEntry);
+            } else { // Editing existing STA
+                allData.stas[currentStaIndex] = currentStaEntry;
+                currentStaIndex = -1; // Reset after editing
+            }
+            
+            saveAllDataToLocalStorage(); // Save updated allData
+            displayProjectSummary(); // Update summary on Page 4
+            
+            page3.classList.add('hidden');
+            page4.classList.remove('hidden');
+        });
+        
+        // Logika untuk tombol "Unduh Proyek Lengkap (JSON)"
+        exportProjectJsonBtn.addEventListener('click', exportFullProjectToJSON);
+        
+        // Logika untuk tombol "Unduh Proyek Lengkap (CSV)"
+        exportProjectCsvBtn.addEventListener('click', exportFullProjectToCSV);
+
+        // Logika untuk tombol "Tambahkan STA Baru"
+        addNewStaBtn.addEventListener('click', function() {
+            staForm.reset();
+            pointsContainer.innerHTML = '';
+            addPointEntry(); // Add first point for new STA
+            calculatedHI = 0;
+            calculatedHiInput.value = '';
+            currentStaIndex = -1; // Indicate new STA creation
+            page4.classList.add('hidden');
+            page2.classList.remove('hidden'); // Go back to STA Setup
+        });
+
+        // Logika untuk tombol "Mulai Proyek Baru"
+        startNewProjectBtn.addEventListener('click', startNewProject);
+
+        // Logika untuk tombol "Keluar Aplikasi"
+        exitBtn.addEventListener('click', exitApplication);
+    </script>
+</body>
+</html>
