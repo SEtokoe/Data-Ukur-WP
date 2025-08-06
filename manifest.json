@@ -1,6 +1,6 @@
 {
-  "name": "Aplikasi Ukur",
-  "short_name": "Aplikasi Ukur",
+  "name": "Cross Section WP",
+  "short_name": "Cross Section WP",
   "description": "Aplikasi pengukuran beda tinggi untuk pekerjaan sipil dan geomatik.",
   "start_url": "index.html",
   "display": "standalone",
